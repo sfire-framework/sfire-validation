@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace sFire\Validation;
 
+use sFire\DataControl\Translators\StringTranslator;
 use sFire\DataControl\TypeArray;
 use sFire\Validation\Collection\FieldCollection;
 use sFire\Validation\Collection\FileCollection;
@@ -35,6 +36,19 @@ class ValidatedData {
         'files' 	=> [],
         'combined'  => []
     ];
+
+
+    /**
+     * Contains field names that should be excluded in the resultset
+     * @var array
+     */
+    private array $exclude = [];
+
+
+    /**
+     * @var string|null
+     */
+    private ?string $prefix = null;
 
 
     /**
@@ -78,6 +92,30 @@ class ValidatedData {
 
 
     /**
+     * Excludes all given field names in the resultset
+     * @param array $fieldNames
+     * @return self
+     */
+    public function exclude(array $fieldNames): self {
+
+        $this -> exclude = $fieldNames;
+        return $this;
+    }
+
+
+    /**
+     *
+     * @param string $prefix
+     * @return self
+     */
+    public function prefix(string $prefix): self {
+
+        $this -> prefix = $prefix;
+        return $this;
+    }
+
+
+    /**
      * Returns an array with the validated data
      * @return array
      */
@@ -98,6 +136,28 @@ class ValidatedData {
 
         //Reset the return types for later use
         $this -> returnTypes = [];
+        
+        //Exclude values in resultset
+        foreach($this -> exclude as $exclude) {
+
+            $translator = new StringTranslator($output);
+            $paths      = $translator -> path($exclude);
+
+            if(null === $paths) {
+                continue;
+            }
+
+            foreach($paths as $keys) {
+                TypeArray::removeFromArray($output, $keys['path']);
+            }
+        }
+
+        //Apply the prefix if there is one
+        if(null !== $this -> prefix) {
+
+            $translator = new StringTranslator($output);
+            $output = $translator -> get($this -> prefix);
+        }
 
         return $output;
     }
@@ -108,9 +168,17 @@ class ValidatedData {
      * @return stdClass
      */
     public function toObject(): stdClass {
-        return json_decode(json_encode($this -> toArray(), JSON_FORCE_OBJECT | JSON_INVALID_UTF8_IGNORE), false);
+        return json_decode($this -> toJson(), false);
     }
 
+
+    /**
+     * Returns an JSON string with the validated data
+     * @return string
+     */
+    public function toJson(): string {
+        return json_encode($this -> toArray(), JSON_FORCE_OBJECT | JSON_INVALID_UTF8_IGNORE);
+    }
 
 
     /**

@@ -137,7 +137,6 @@ class Validator {
         $this -> message        = new Message();
         $this -> combine        = new CombineCollection();
         $this -> errors         = new ErrorCollection();
-
     }
 
 

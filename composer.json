@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=7.4",
-        "sfire-framework/sfire-datacontrol": "1.0.*",
+        "sfire-framework/sfire-datacontrol": ">=1.0.1",
         "sfire-framework/sfire-http": "1.0.*"
     },
     "require-dev": {

@@ -41,12 +41,31 @@ class ErrorCollection {
 
 
     /**
-     * Returns a Filter object for retrieving all, first and last error messages
+     * Returns all error messages based on optional field name set in the constructor
      * @param null|string $fieldName
-     * @return Filter
+     * @return array
      */
-    public function get(string $fieldName = null): Filter {
-        return new Filter($this -> errors, $fieldName);
+    public function get(string $fieldName = null): array {
+
+        $output = [];
+
+        if(null === $fieldName) {
+
+            foreach($this -> errors as $errors) {
+
+                foreach($errors as $error) {
+                    $output[] = $error;
+                }
+            }
+        }
+        elseif(isset($this -> errors[$fieldName]) ) {
+
+            foreach($this -> errors[$fieldName] as $error) {
+                $output[] = $error;
+            }
+        }
+
+        return $output;
     }
 
 
@@ -68,7 +87,11 @@ class ErrorCollection {
     }
 
 
-    public function distinct() {
+    /**
+     * Returns the first found error for each field name
+     * @return array
+     */
+    public function distinct(): array {
 
         $output = [];
 
