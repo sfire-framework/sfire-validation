@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace sFire\Validation\Errors;
 
+use \ArrayIterator;
+
 
 /**
  * Class ErrorCollection
@@ -45,7 +47,7 @@ class ErrorCollection {
      * @param null|string $fieldName
      * @return array
      */
-    public function get(string $fieldName = null): array {
+    public function get(string $fieldName = null): ArrayIterator {
 
         $output = [];
 
@@ -65,7 +67,7 @@ class ErrorCollection {
             }
         }
 
-        return $output;
+        return new ArrayIterator($output);
     }
 
 

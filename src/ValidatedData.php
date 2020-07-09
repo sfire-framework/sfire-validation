@@ -39,10 +39,17 @@ class ValidatedData {
 
 
     /**
-     * Contains field names that should be excluded in the resultset
+     * Contains field names that will be filtered out the result set
      * @var array
      */
-    private array $exclude = [];
+    private array $blacklist = [];
+
+
+    /**
+     * Contains field names that only be included (whitelist) in the result set
+     * @var array
+     */
+    private array $whitelist = [];
 
 
     /**
@@ -92,13 +99,25 @@ class ValidatedData {
 
 
     /**
-     * Excludes all given field names in the resultset
+     * Excludes (blacklist) all given field names in the result set
      * @param array $fieldNames
      * @return self
      */
-    public function exclude(array $fieldNames): self {
+    public function blacklist(array $fieldNames): self {
 
-        $this -> exclude = $fieldNames;
+        $this -> blacklist = $fieldNames;
+        return $this;
+    }
+
+
+    /**
+     * Includes (whitelist) all given field names in the result set
+     * @param array $fieldNames
+     * @return self
+     */
+    public function whitelist(array $fieldNames): self {
+
+        $this -> whitelist = $fieldNames;
         return $this;
     }
 
@@ -137,8 +156,8 @@ class ValidatedData {
         //Reset the return types for later use
         $this -> returnTypes = [];
         
-        //Exclude values in resultset
-        foreach($this -> exclude as $exclude) {
+        //Exclude values in result set based on blacklist
+        foreach($this -> blacklist as $exclude) {
 
             $translator = new StringTranslator($output);
             $paths      = $translator -> path($exclude);
@@ -150,6 +169,28 @@ class ValidatedData {
             foreach($paths as $keys) {
                 TypeArray::removeFromArray($output, $keys['path']);
             }
+        }
+
+        //Include values in result set based on whitelist
+        if(count($this -> whitelist) > 0) {
+
+            $tmp = [];
+
+            foreach($this -> whitelist as $include) {
+
+                $translator = new StringTranslator($output);
+                $paths      = $translator -> path($include);
+
+                if(null === $paths) {
+                    continue;
+                }
+
+                foreach($paths as $keys) {
+                    TypeArray::insertIntoArray($tmp, $keys['path'], $keys['value']);
+                }
+            }
+
+            $output = $tmp;
         }
 
         //Apply the prefix if there is one

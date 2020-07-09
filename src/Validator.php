@@ -125,11 +125,11 @@ class Validator {
     private ?ErrorCollection $errors = null;
 
 
-	/**
-	 * Constructor
-	 * @param null|array $validationData [optional] The source of the data that needs to be validated
-	 */
-	public function __construct(array $validationData = null) {
+    /**
+     * Constructor
+     * @param null|array $validationData [optional] The source of the data that needs to be validated
+     */
+    public function __construct(array $validationData = null) {
 
         $this -> validationData = $validationData ?? $_POST;
         $this -> translator     = new StringTranslator($this -> validationData);
@@ -145,12 +145,12 @@ class Validator {
      * @param string ...$fieldNames
      * @return FieldCollection
      */
-	public function field(string ...$fieldNames): FieldCollection {
+    public function field(string ...$fieldNames): FieldCollection {
 
-	    $fieldCollection = new FieldCollection($fieldNames);
-	    $fieldCollection -> bail($this -> bail);
-	    $this -> fieldCollection[] = $fieldCollection;
-	    $this -> addFieldNames($fieldNames, FieldCollection::class);
+        $fieldCollection = new FieldCollection($fieldNames);
+        $fieldCollection -> bail($this -> bail);
+        $this -> fieldCollection[] = $fieldCollection;
+        $this -> addFieldNames($fieldNames, FieldCollection::class);
 
         return $fieldCollection;
     }
@@ -179,7 +179,7 @@ class Validator {
      */
     public function extend(string $name): Extend {
 
-	    $extend = new Extend();
+        $extend = new Extend();
         $this -> extendCollection[$name] = $extend;
 
         return $extend;
@@ -204,7 +204,7 @@ class Validator {
      * @return Combine
      */
     public function combine(string ...$fields): Combine {
-	    return new Combine($this -> combine, $fields);
+        return new Combine($this -> combine, $fields);
     }
 
 
@@ -233,7 +233,7 @@ class Validator {
      * @return bool Returns true if validation fails, false otherwise
      */
     public function fails(): bool {
-	    return !$this -> execute();
+        return !$this -> execute();
     }
 
 
@@ -275,11 +275,11 @@ class Validator {
             return $this -> validated;
         }
 
-	    $passed = true;
+        $passed = true;
 
-	    foreach($this -> fieldCollection as $fieldItem) {
+        foreach($this -> fieldCollection as $fieldItem) {
 
-	        /** @var CollectionAbstract $fieldItem */
+            /** @var CollectionAbstract $fieldItem */
             $fieldNames = $fieldItem -> getFieldNames();
             $ruleSets   = $fieldItem -> getRuleCollection();
             $middleware = $this -> getMiddleware($fieldItem);
@@ -345,8 +345,8 @@ class Validator {
             }
         }
 
-	    $this -> validated = $passed;
-	    return $passed;
+        $this -> validated = $passed;
+        return $passed;
     }
 
 
@@ -561,7 +561,6 @@ class Validator {
         }
 
         //Check if field is a combine instance
-
         if($combine = $this -> combine -> get($fieldName)) {
             $path = [['value' => $combine -> combine(), 'path' => explode('.', $fieldName)]];
         }

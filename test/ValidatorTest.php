@@ -46,9 +46,6 @@ final class ValidatorTest extends TestCase {
      */
     public function setUp(): void {
 
-        <input type="file" name="file[]">
-        <input type="file" name="file[]">
-
         //Mocking uploaded file
         $_FILES = [
 
@@ -141,28 +138,48 @@ final class ValidatorTest extends TestCase {
         $validator -> bail(true);
         $validator -> field('number') -> isInt() -> between(0, 10);
         $this -> assertFalse($validator -> passes());
-        $this -> assertCount(1, $validator -> errors() -> get() -> all());
+        $this -> assertCount(1, $validator -> errors() -> get());
 
 
         $validator = new Validator(['number' => 25.52]);
         $validator -> bail(false);
         $validator -> field('number') -> isInt() -> between(0, 10);
         $this -> assertFalse($validator -> passes());
-        $this -> assertCount(2, $validator -> errors() -> get() -> all());
+        $this -> assertCount(2, $validator -> errors() -> get());
 
 
         $validator = new Validator(['number' => 25.52, 'string' => '']);
         $validator -> field('number') -> bail(true) -> isInt() -> between(0, 10);
         $validator -> field('string') -> isInt() -> between(0, 10);
         $this -> assertFalse($validator -> passes());
-        $this -> assertCount(3, $validator -> errors() -> get() -> all());
+        $this -> assertCount(3, $validator -> errors() -> get());
 
 
         $validator = new Validator(['number' => 25.52, 'string' => '']);
         $validator -> field('number') -> bail(true) -> isInt() -> between(0, 10);
         $validator -> field('string') -> bail(false) -> isInt() -> between(0, 10);
         $this -> assertFalse($validator -> passes());
-        $this -> assertCount(3, $validator -> errors() -> get() -> all());
+        $this -> assertCount(3, $validator -> errors() -> get());
+    }
+
+
+    public function testWhitelist() {
+
+        $validator = new Validator(['contact' => ['add' => ['name' => 'Brenda', 'email' => 'email@domain.com']]]);
+        $validator -> field('contact.add.name') -> required();
+        $validator -> field('contact.add.email') -> required();
+        $this -> assertTrue($validator -> passes());
+        $this -> assertEquals($validator -> getValidatedData() -> whitelist(['contact.add.name']) -> toArray(), ['add' => ['name' => 'Brenda']]);
+    }
+
+
+    public function testBlacklist() {
+
+        $validator = new Validator(['contact' => ['add' => ['name' => 'Brenda', 'email' => 'email@domain.com']]]);
+        $validator -> field('contact.add.name') -> required();
+        $validator -> field('contact.add.email') -> required();
+        $this -> assertTrue($validator -> passes());
+        $this -> assertEquals($validator -> getValidatedData() -> blacklist(['contact.add.email']) -> toArray(), ['add' => ['name' => 'Brenda']]);
     }
 
     /*
