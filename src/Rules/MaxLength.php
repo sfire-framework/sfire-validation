@@ -28,10 +28,10 @@ class MaxLength extends RuleAbstract {
 
     /**
      * Constructor
-     * @param int $characters
+     * @param int $length
      */
-    public function __construct(int $characters) {
-        $this -> addParameter('characters', $characters);
+    public function __construct(int $length) {
+        $this -> addParameter('characters', $length);
     }
 
 

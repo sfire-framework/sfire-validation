@@ -199,4 +199,16 @@ abstract class CollectionAbstract {
     public function getMiddleware(): ?array {
         return $this -> middleware;
     }
+
+
+    /**
+     * Uses all the rules from another defined field validator
+     * @param array $ruleCollection
+     * @return self
+     */
+    public function using(array $ruleCollection): self {
+
+        $this -> ruleCollection = array_merge($ruleCollection, $this -> ruleCollection);
+        return $this;
+    }
 }

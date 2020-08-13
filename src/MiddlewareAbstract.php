@@ -37,7 +37,7 @@ abstract class MiddlewareAbstract {
 
     /**
      * Contains a Combine instance
-     * @var Combine
+     * @var null|Combine
      */
     private ?Combine $combine = null;
 
@@ -89,7 +89,7 @@ abstract class MiddlewareAbstract {
 
     /**
      * Set a new Combine instance
-     * @param Combine $combine A Combine instance
+     * @param null|Combine $combine A Combine instance
      * @return void
      */
     public function setCombine(?Combine $combine): void {

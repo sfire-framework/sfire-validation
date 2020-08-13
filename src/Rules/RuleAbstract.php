@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace sFire\Validation\Rules;
 
 use ReflectionClass;
+use ReflectionException;
 use sFire\DataControl\Translators\StringTranslator;
 use sFire\Validation\Exception\InvalidArgumentException;
 use sFire\Validation\File;
@@ -160,6 +161,7 @@ abstract class RuleAbstract {
     /**
      * Returns the class name of the current rule
      * @return string
+     * @throws ReflectionException
      */
     public function getName(): string {
         return (new ReflectionClass($this)) -> getShortName();

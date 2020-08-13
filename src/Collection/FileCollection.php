@@ -19,6 +19,5 @@ use sFire\Validation\RuleTraits\FileRuleTrait;
  * @package sFire\Validation
  */
 class FileCollection extends CollectionAbstract {
-
     use FileRuleTrait;
 }

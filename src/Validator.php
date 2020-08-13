@@ -37,14 +37,42 @@ class Validator {
      * Contains all the field collections with their rules, middleware, etc.
      * @var array
      */
-    private array $fieldCollection = [];
+    public array $fieldCollection = [];
 
 
     /**
      * Contains all the custom rules defined with the "extend" method
      * @var array
      */
-    private array $extendCollection = [];
+    public array $extendCollection = [];
+
+
+    /**
+     * Contains all the middleware that needs to be executed
+     * @var array
+     */
+    public array $middleware = [];
+
+
+    /**
+     * Contains if validation should be enabled or disabled globally when a first validation error occurs
+     * @var bool
+     */
+    public bool $bail = false;
+
+
+    /**
+     * Contains all the unique field names with their collection type (field, combined, file)
+     * @var array
+     */
+    public array $fieldNames = [];
+
+
+    /**
+     * Contains an instance of CombineCollection
+     * @var null|CombineCollection
+     */
+    public ?CombineCollection $combine = null;
 
 
     /**
@@ -70,27 +98,6 @@ class Validator {
 
 
     /**
-     * Contains all the middleware that needs to be executed
-     * @var array
-     */
-    private array $middleware = [];
-
-
-    /**
-     * Contains if validation should be enabled or disabled globally when a first validation error occurs
-     * @var bool
-     */
-    private bool $bail = false;
-
-
-    /**
-     * Contains all the unique field names with their collection type (field, combined, file)
-     * @var array
-     */
-    private array $fieldNames = [];
-
-
-    /**
      * Contains an instance of StringTranslator
      * @var null|StringTranslator
      */
@@ -102,13 +109,6 @@ class Validator {
      * @var null|Message
      */
     private ?Message $message = null;
-
-
-    /**
-     * Contains an instance of CombineCollection
-     * @var null|CombineCollection
-     */
-    private ?CombineCollection $combine = null;
 
 
     /**
@@ -169,6 +169,40 @@ class Validator {
         $this -> addFieldNames($fieldNames, FileCollection::class);
 
         return $fileCollection;
+    }
+
+
+    /**
+     * Uses all the rules, middleware, bails, combines, etc. from another validator instance
+     * @param Validator $validator
+     * @return void
+     */
+    public function using(Validator $validator): void {
+
+        $this -> fieldCollection  = array_merge($validator -> fieldCollection, $this -> fieldCollection);
+        $this -> fieldNames       = array_merge($validator -> fieldNames, $this -> fieldNames);
+        $this -> extendCollection = array_merge($validator -> extendCollection, $this -> extendCollection);
+        $this -> middleware       = array_merge($validator -> middleware, $this -> middleware);
+        $this -> bail             = $validator -> bail;
+        $this -> combine          = $validator -> combine;
+    }
+
+
+    /**
+     * Returns all the rules for a given field name as an array
+     * @param string $fieldName
+     * @return array
+     */
+    public function getRules(string $fieldName): array {
+
+        foreach($this -> fieldCollection as $collection) {
+
+            if(true === in_array($fieldName, $collection -> getFieldNames())) {
+                return $collection -> getRuleCollection();
+            }
+        }
+
+        return [];
     }
 
 
@@ -251,6 +285,8 @@ class Validator {
      * @return ErrorCollection
      */
     public function errors(): ErrorCollection {
+
+        $this -> execute();
         return $this -> errors;
     }
 
@@ -260,6 +296,8 @@ class Validator {
      * @return null|ValidatedData
      */
     public function getValidatedData(): ?ValidatedData {
+
+        $this -> execute();
         return $this -> validatedData;
     }
 

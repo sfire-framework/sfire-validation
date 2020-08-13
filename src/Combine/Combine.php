@@ -23,21 +23,21 @@ class Combine {
 
     /**
      * Contains the glue that will holds all the values together
-     * @var string
+     * @var null|string
      */
-    private string $glue = '';
+    private ?string $glue = null;
 
 
     /**
      * Contains a format that will be used like sprintf
-     * @var string
+     * @var null|string
      */
     private ?string $format = null;
 
 
     /**
      * Contains the name of the combine
-     * @var string
+     * @var null|string
      */
     private ?string $alias = null;
 
@@ -215,7 +215,12 @@ class Combine {
                 $output = implode($this -> glue, $this -> fields);
             }
             else {
-                $output = vsprintf($this -> format, $this -> fields);
+
+                $output = $this -> format;
+
+                foreach($this -> fields as $fieldName => $value) {
+                    $output = str_replace(':' . $fieldName, $value, $output);
+                }
             }
         }
 
